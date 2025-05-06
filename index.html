@@ -1,4 +1,6 @@
-<html><head><base href="." /><title>Chain of Survival Ordering Game</title>
+<html><head><base href="." target="_blank">
+<meta charset="UTF-8">
+<title>CPR Challenge</title>
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -11,340 +13,299 @@
         padding: 20px;
     }
 
-    .game-container {
+    .container {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
         max-width: 800px;
+        width: 100%;
         text-align: center;
     }
 
-    .cards {
-        display: flex;
-        flex-direction: column;
-        gap: 40px;
-        margin: 20px 0;
-        align-items: center;
-        position: relative;
+    h1, p {
+        text-align: center;
     }
 
-    .card {
-        background: #fff;
-        border: 2px solid #2196F3;
-        border-radius: 50%;
-        width: 150px;
-        height: 150px;
-        cursor: move;
-        transition: all 0.3s ease;
+    .aed-reminder {
+        background: #fff3cd;
+        color: #856404;
+        padding: 10px;
+        border-radius: 5px;
+        margin: 10px auto;
+        border-left: 5px solid #ffeeba;
+        font-weight: bold;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 16px;
-        text-align: center;
-        position: relative;
+        gap: 10px;
+        max-width: 600px;
     }
 
-    .card::after {
-        content: '↓';
-        position: absolute;
-        bottom: -35px;
-        left: 50%;
-        transform: translateX(-50%);
+    .aed-icon {
+        color: #856404;
         font-size: 24px;
-        color: #2196F3;
-        z-index: 1;
-        opacity: 1;
-        transition: opacity 0.3s ease;
     }
 
-    .card:last-child::after {
-        content: '';
-    }
-
-    .card.correct {
-        background: #4caf50;
-        color: white;
-        border-color: #45a049;
-    }
-
-    .card.incorrect {
-        background: #ff5252;
-        color: white;
-        border-color: #ff1744;
-    }
-
-    .card-content {
-        max-width: 80%;
-        word-wrap: break-word;
-    }
-
-    .score {
-        font-size: 1.2em;
+    .steps-source, .steps-target {
         margin: 20px 0;
+        padding: 10px;
+        background: #f5f5f5;
+        border-radius: 5px;
+        min-height: 100px;
+    }
+
+    .steps-target {
+        border: 2px dashed #007bff;
+    }
+
+    .step {
+        background: white;
+        padding: 15px;
+        margin: 5px;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: left;
+    }
+
+    .step:hover {
+        background: #e9ecef;
+    }
+
+    .correct {
+        border-color: #28a745;
+        background: #d4edda;
+    }
+
+    .incorrect {
+        border-color: #dc3545;
+        background: #f8d7da;
+    }
+
+    .buttons-container {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
     }
 
     button {
-        background: #2196F3;
+        background: #007bff;
         color: white;
         border: none;
         padding: 10px 20px;
         border-radius: 5px;
         cursor: pointer;
-        font-size: 1.1em;
+        font-size: 16px;
         margin: 10px;
     }
 
     button:hover {
-        background: #1976D2;
+        background: #0056b3;
     }
 
-    .header {
-        color: #1565C0;
-        margin-bottom: 20px;
+    .feedback {
+        font-size: 1.2em;
+        font-weight: bold;
+        padding: 15px;
+        margin: 15px 0;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        animation: feedback-pop 0.3s ease-out;
+    }
+
+    @keyframes feedback-pop {
+        0% { transform: scale(0.95); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
     }
 
     .timer {
-        font-size: 1.2em;
+        font-size: 24px;
+        color: #007bff;
         margin: 10px 0;
-        color: #1565C0;
     }
 
-    .modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.7);
-        align-items: center;
+    .game-stats {
+        display: flex;
         justify-content: center;
+        align-items: center;
+        width: 100%;
+        margin-bottom: 20px;
     }
 
-    .modal-content {
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-        text-align: center;
-        max-width: 500px;
+    .trophy {
+        display: inline-block;
+        margin-left: 10px;
     }
 
-    .pokemon-reward {
-        max-width: 200px;
-        margin: 20px auto;
+    .trophy svg {
+        width: 40px;
+        height: 40px;
+        vertical-align: middle;
     }
 
-    .modal[style*="display: flex"] ~ .game-container .card::after {
-        opacity: 0;
-    }
-    
+    .gold-trophy { fill: #FFD700; }
+    .silver-trophy { fill: #C0C0C0; }
+    .bronze-trophy { fill: #CD7F32; }
+
     .footer {
-        margin-top: 30px;
-        color: #666;
-        font-size: 0.9em;
         text-align: center;
+        margin-top: 20px;
+        font-size: 0.9em;
+        color: #666;
     }
 </style>
 </head>
 <body>
-    <div class="game-container">
-        <h1 class="header">Chain of Survival Challenge</h1>
-        <div class="timer" id="timer">Time: 0:00</div>
-        <p>Drag and drop the circles (links) to put them in the correct order</p>
-        <div class="cards" id="gameBoard"></div>
-        <button onclick="checkOrder()">Check Order</button>
-        <button onclick="resetGame()">New Game</button>
-    </div>
+    <div class="container">
+        <h1>CPR Challenge</h1>
+        <p>Tap on the steps above to place them in the correct order in the box below. Tap a step in the box to send it back. The timer will start automatically when you tap the first step!</p>
+        
+        <div class="aed-reminder">
+            <span class="aed-icon">&#x26a0;</span>
+            Remember: Use an AED as soon as one is available!
+        </div>
+        
+        <div class="game-stats">
+            <div class="timer" id="timer">Time: 0:00</div>
+        </div>
+        
+        <div class="steps-source" id="source-steps">
+            <div class="step">CHECK the scene for safety, form an initial impression and use personal protective equipment (PPE)</div>
+            <div class="step">If the person appears unresponsive, CHECK for responsiveness using shout-tap-shout</div>
+            <div class="step">If the person does not respond, CALL for help by dialing the local EMS number and get equipment like an AED, or ask someone to do so</div>
+            <div class="step">CHECK for breathing by looking for movement of the chest and stomach</div>
+            <div class="step">Start COMPRESSIONs if the person is not breathing or only gasping</div>
+            <div class="step">After 30 chest compressions, open the person's AIRWAY to a past-neutral position using the head-tilt/chin-lift technique and give 2 BREATHs</div>
+            <div class="step">Continue giving sets of 30 chest compressions and 2 breaths until help arrives</div>
+        </div>
 
-    <div class="modal" id="congratsModal">
-        <div class="modal-content">
-            <h2>Congratulations!</h2>
-            <p id="timeResult"></p>
-            <p id="pokemonMessage"></p>
-            <img id="pokemonReward" class="pokemon-reward" src="" alt="Pokemon reward">
-            <p>Screenshot to capture the moment and share with your friends!</p>
-            <button onclick="showExplanations()">See Explanation</button>
+        <h3>Drop steps here in correct order:</h3>
+        <div class="steps-target" id="target-steps"></div>
+
+        <div class="buttons-container">
+            <button onclick="checkOrder()">Check Order</button>
+            <button onclick="resetGame()">Reset Game</button>
+        </div>
+        
+        <div class="feedback" id="feedback"></div>
+
+        <div class="footer">
+            <a href="https://www.aaronshi.cc" target="_blank" rel="noopener noreferrer">Created by Aaron Shi. v1.250131<img src="https://alittlemoreenglish.weebly.com/uploads/2/6/6/3/26638990/favicon-32x32_orig.png" alt="Aaron Shi" width="15" height="15"></a><br>
+            Reference: Taiwan Red Cross &amp; American Red Cross
         </div>
     </div>
 
-    <div class="modal" id="explanationModal">
-        <div class="modal-content">
-            <h2>Chain of Survival Explained</h2>
-            <div id="explanationContent"></div>
-            <button onclick="closeExplanationModal()">Close</button>
-        </div>
-    </div>
-
-    <div class="footer">
-        <a href="https://www.aaronshi.cc" target="_blank" rel="noopener noreferrer">Created by Aaron Shi. v1.250131<img src="https://alittlemoreenglish.weebly.com/uploads/2/6/6/3/26638990/favicon-32x32_orig.png" alt="Aaron Shi" width="15" height="15"></a><br>
-        Reference: 2020 American Heart Association Chains of Survival for OHCA
-    </div>
-
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-<script>
-const steps = [
-    {
-        id: 1,
-        content: "Early Recognition and Call for Help",
-        description: "Recognize emergency and call emergency services immediately"
-    },
-    {
-        id: 2,
-        content: "Early CPR",
-        description: "Begin chest compressions and rescue breaths"
-    },
-    {
-        id: 3,
-        content: "Early Defibrillation",
-        description: "Use AED as soon as available to analyze and shock if needed"
-    },
-    {
-        id: 4,
-        content: "Early Advanced Care",
-        description: "EMS provides advanced life support and medications"
-    },
-    {
-        id: 5,
-        content: "Post-Resuscitation Care",
-        description: "Specialized treatment and monitoring in hospital"
-    },
-    {
-        id: 6,
-        content: "Recovery",
-        description: "Rehabilitation, ongoing care, and return to daily activities"
-    }
-];
-
+<script>const correctOrder = ["CHECK the scene for safety, form an initial impression and use personal protective equipment (PPE)", "If the person appears unresponsive, CHECK for responsiveness using shout-tap-shout", "If the person does not respond, CALL for help by dialing the local EMS number and get equipment like an AED, or ask someone to do so", "CHECK for breathing by looking for movement of the chest and stomach", "Start COMPRESSIONs if the person is not breathing or only gasping", "After 30 chest compressions, open the person's AIRWAY to a past-neutral position using the head-tilt/chin-lift technique and give 2 BREATHs", "Continue giving sets of 30 chest compressions and 2 breaths until help arrives"];
 let startTime;
 let timerInterval;
-
-function updateTimer() {
-    const currentTime = new Date();
-    const timeDiff = Math.floor((currentTime - startTime) / 1000);
-    const minutes = Math.floor(timeDiff / 60);
-    const seconds = timeDiff % 60;
-    document.getElementById('timer').textContent = 
-        `Time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+const sourceContainer = document.getElementById('source-steps');
+const targetContainer = document.getElementById('target-steps');
+const trophySVG = `<svg viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/></svg>`;
+function setupClickHandling() {
+    const steps = document.querySelectorAll('.step');
+    steps.forEach(step => {
+        step.addEventListener('click', handleStepClick);
+        step.removeAttribute('draggable');
+    });
 }
 
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-}
-
-async function getRandomPokemon() {
-    const randomId = Math.floor(Math.random() * 898) + 1;
-    const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${randomId}`);
-    const data = await response.json();
-    return {
-        imageUrl: data.sprites.other['official-artwork'].front_default,
-        name: data.name.charAt(0).toUpperCase() + data.name.slice(1)
-    };
-}
-
-function createBoard() {
-    const gameBoard = document.getElementById('gameBoard');
-    gameBoard.innerHTML = '';
+function handleStepClick(e) {
+    const step = e.currentTarget;
+    const isInTarget = step.parentElement === targetContainer;
     
-    shuffleArray([...steps]).forEach((step, index) => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.dataset.id = step.id;
-        card.innerHTML = `
-            <div class="card-content">
-                <strong>${step.content}</strong>
-            </div>
-        `;
-        gameBoard.appendChild(card);
-    });
+    if (!startTime) {
+        startTimer();
+    }
+    
+    if (isInTarget) {
+        sourceContainer.appendChild(step);
+    } else {
+        targetContainer.appendChild(step);
+    }
+}
 
-    new Sortable(gameBoard, {
-        animation: 150,
-        ghostClass: 'sortable-ghost'
-    });
-
-    startTime = new Date();
-    if (timerInterval) clearInterval(timerInterval);
+function startTimer() {
+    startTime = Date.now();
     timerInterval = setInterval(updateTimer, 1000);
 }
 
-function showExplanations() {
-    const explanationModal = document.getElementById('explanationModal');
-    const explanationContent = document.getElementById('explanationContent');
-    document.getElementById('congratsModal').style.display = 'none';
-    
-    let content = '<div style="text-align: left; padding: 20px;">';
-    steps.forEach((step, index) => {
-        content += `
-            <div style="margin-bottom: 20px;">
-                <h3>${index + 1}. ${step.content}</h3>
-                <p>${step.description}</p>
-            </div>
-        `;
-    });
-    content += '</div>';
-    
-    explanationContent.innerHTML = content;
-    explanationModal.style.display = 'flex';
+function updateTimer() {
+    const currentTime = Date.now();
+    const elapsedTime = Math.floor((currentTime - startTime) / 1000);
+    const minutes = Math.floor(elapsedTime / 60);
+    const seconds = elapsedTime % 60;
+    document.getElementById('timer').textContent = `Time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
-function closeExplanationModal() {
-    document.getElementById('explanationModal').style.display = 'none';
-    resetGame();
-}
-
-async function showCongratsModal(timeTaken) {
-    const modal = document.getElementById('congratsModal');
-    const timeResult = document.getElementById('timeResult');
-    const pokemonImg = document.getElementById('pokemonReward');
-    const pokemonMessage = document.getElementById('pokemonMessage');
-    
-    const minutes = Math.floor(timeTaken / 60);
-    const seconds = timeTaken % 60;
-    timeResult.textContent = `You completed the challenge in ${minutes}:${seconds.toString().padStart(2, '0')}!`;
-    
-    try {
-        const pokemon = await getRandomPokemon();
-        pokemonImg.src = pokemon.imageUrl;
-        pokemonMessage.textContent = `You've won ${pokemon.name} as your reward!`;
-    } catch (error) {
-        pokemonImg.src = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png";
-        pokemonMessage.textContent = "You've won Pikachu as your reward!";
+function getTrophyMessage(elapsedSeconds) {
+    if (elapsedSeconds <= 60) {
+        return `<span class="trophy gold-trophy">${trophySVG}</span> 
+                    <span style="font-size: 1.3em; color: #FFD700">Outstanding! Gold Trophy Achievement!</span><br>
+                    Completed in under 60 seconds!`;
+    } else if (elapsedSeconds <= 90) {
+        return `<span class="trophy silver-trophy">${trophySVG}</span>
+                    <span style="font-size: 1.3em; color: #A0A0A0">Great job! Silver Trophy Achievement!</span><br>
+                    Completed in under 90 seconds!`;
+    } else if (elapsedSeconds <= 120) {
+        return `<span class="trophy bronze-trophy">${trophySVG}</span>
+                    <span style="font-size: 1.3em; color: #CD7F32">Good work! Bronze Trophy Achievement!</span><br>
+                    Completed in under 120 seconds!`;
+    } else {
+        return `<span style="font-size: 1.2em; color: #444">Keep practicing! Try to complete the challenge faster to earn a trophy!</span>`;
     }
-    
-    modal.style.display = 'flex';
-}
-
-function closeModal() {
-    document.getElementById('congratsModal').style.display = 'none';
-    resetGame();
 }
 
 function checkOrder() {
-    const cards = document.querySelectorAll('.card');
-    let allCorrect = true;
-
-    cards.forEach((card, index) => {
-        const correctPosition = parseInt(card.dataset.id) === index + 1;
-        card.classList.remove('correct', 'incorrect');
-        card.classList.add(correctPosition ? 'correct' : 'incorrect');
-        if (!correctPosition) allCorrect = false;
-    });
-
-    if (allCorrect) {
-        clearInterval(timerInterval);
-        const timeTaken = Math.floor((new Date() - startTime) / 1000);
-        showCongratsModal(timeTaken);
+    const currentOrder = Array.from(targetContainer.querySelectorAll('.step')).map(step => step.textContent);
+    let correct = true;
+    let feedback = "";
+    if (currentOrder.length !== correctOrder.length) {
+        feedback = "Please place all steps in the order box first!";
+        const feedbackElement = document.getElementById('feedback');
+        feedbackElement.innerHTML = feedback;
+        feedbackElement.style.background = '#f8d7da';
+        feedbackElement.style.color = '#721c24';
+        feedbackElement.style.borderLeft = '5px solid #dc3545';
+        return;
     }
+    targetContainer.querySelectorAll('.step').forEach((step, index) => {
+        step.classList.remove('correct', 'incorrect');
+        if (step.textContent === correctOrder[index]) {
+            step.classList.add('correct');
+        } else {
+            step.classList.add('incorrect');
+            correct = false;
+        }
+    });
+    if (correct) {
+        const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+        feedback = `Perfect! You've got the correct order!<br>${getTrophyMessage(elapsedSeconds)}`;
+        clearInterval(timerInterval);
+    } else {
+        feedback = "Not quite right. Try again!";
+    }
+    const feedbackElement = document.getElementById('feedback');
+    feedbackElement.innerHTML = feedback;
+    feedbackElement.style.background = correct ? '#d4edda' : '#f8d7da';
+    feedbackElement.style.color = correct ? '#155724' : '#721c24';
+    feedbackElement.style.borderLeft = correct ? '5px solid #28a745' : '5px solid #dc3545';
 }
 
 function resetGame() {
-    const cards = document.querySelectorAll('.card');
-    cards.forEach(card => card.classList.remove('correct', 'incorrect'));
-    createBoard();
+    clearInterval(timerInterval);
+    startTime = null;
+    document.getElementById('timer').textContent = 'Time: 0:00';
+    const steps = Array.from(document.querySelectorAll('.step'));
+    steps.sort(() => Math.random() - 0.5);
+    steps.forEach(step => {
+        step.classList.remove('correct', 'incorrect');
+        sourceContainer.appendChild(step);
+    });
+    document.getElementById('feedback').innerHTML = '';
 }
 
-// Initialize the game
-createBoard();
-</script>
+setupClickHandling();
+resetGame();</script>
 </body></html>
